@@ -10,6 +10,11 @@ pipeline {
         CONTAINER_NAME = "java-maven-container"
     }
     stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'master', url: 'https://github.com/Khushalsarode/maven_java_project_devops.git'
+            }
+        }
         stage('Build') {
             steps {
                 sh 'mvn -B -DskipTests clean package'
@@ -36,8 +41,12 @@ pipeline {
                     sh "docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} ."
                     sh "docker rm -f ${CONTAINER_NAME} || true"
                     sh "docker run --name ${CONTAINER_NAME} ${IMAGE_NAME}:${BUILD_NUMBER}"
+                    echo "Docker logs for container ${CONTAINER_NAME}:"
+                    sh "docker logs ${CONTAINER_NAME}"
+                    
                 }
             }
         }
+
     }
 }
